@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Технология Blazor</title>
+		<link href="styles.css" rel="stylesheet"/>
+	</head>
+		
+	<body>
+		
+		<div id="navMenu">
+			<ul>
+				<li><a href="#Blazor">Какво е Blazor?</a></li>
+				<li><a href="#clientsideBlazor">Архитектура на Blazor в браузъра (Client-side Blazor)</a></li>
+				<li><a href="#wasm">WebAssembly</a></li>
+				<li><a href="#dotNETinsteadofJS">Възможност да изпълняваме C#.NET код в браузъра вместо JS</a></li>
+				<li><a href="#Razor">Razor компоненти и тяхната роля</a></li>
+				<li><a href="#serversideBlazor">Blazor от страна на сървъра (Server-side Blazor)</a></li>
+	
+				<li><a href="#moreAboutBlazor">Допълнения</a></li>
+				<ol>
+					<li><a href="#codeSharing">Споделяне на код с Blazor</a></li>
+					<li><a href="#noPluginsNoCodeTransp">Технология от ново поколение без необходимост от plugins или code transpilation</a></li>
+					<li><a href="#JSinterop">Оперативна съвместимост с JS</a></li>
+				</ol>
+				<li><a href="#demo">Demo</a></li>
+				<ol>
+					<li><a href="#components">Компоненти, преизползване на компоненти и споделяне на код</a></li>
+					<li><a href="#demoapp">Weather Forecast App</a></li>
+				</ol>
+				<li><a href="#futureOfBlazor">Бъдещето на Blazor? WebAssembly and Blazor: Reassembling the Web?</a></li>
+				<li><a href="#reference">Използвана литература</a></li>
+			</ul>
+		</div>
+		
+		<div id="content">
+			<h1 align="center">Технология Blazor</h1>
+
+			<br/>
+			<h2 id="Blazor">Какво е Blazor?</h2>
+			<p>
+				Blazor е компонентно-базирана SPA (Single-page application) уеб UI платформа, разработвана от Microsoft, която позволява създаването на уеб приложения, базирани на C# 
+				и HTML. Blazor приложенията могат да се изпълняват от страна на клиента в браузъра върху WebAssembly (client-side Blazor) или от страна на сървъра като част от 
+				ASP.NET Core приложение (server-side Blazor). Предстои да разгледаме поотделно тези две архитектури.
+				<a href="#res1">[1]</a>
+			</p>
+			<figure>
+				<img src="blazor_logo.png" width="250" height="250"/>
+				<figcaption>Фигура 1. Blazor logo</figcaption>
+			</figure>
+			<br/>
+			<h2 id="clientsideBlazor">Blazor от страна на клиента (Blazor WebAssembly архитектура)</h2>
+			<p>
+				Преди появата на технологии като Blazor JavaScript имаше монопол в уеб разработката от страна на клиента. Като разработчици имахме избор между различни JS 
+				платформи за уеб разработка (Angular, React, Vue etc.), но в крайна сметка всичко опираше до JavaScript, що се отнася до кода за изпълнение в браузъра. 
+				Революционната промяна на това статукво се случва с появата на WebAssembly.
+			</p>
+			<p id="wasm">
+			    WebAssembly (съкращение Wasm) е език от ниско ниво, който дефинира формат на преносим двоичен код (portable binary code) и съответстващи текстови инструкции 
+				на асемблерен език. Технологията е отворен уеб стандарт, който се появява през март 2017г. и днес се поддържа от всички съвременни браузъри без необходимост от plugins. 
+				Идеята зад WebAssembly е да позволява код, написан на какъвто и да било език от високо ниво, да се изпълнява в браузъра, стига да е компилируем до WebAssembly bytecode. 
+				Това дава на разработчиците много по-широк избор на технологии за client-side разработка от предишните възможности, свеждащи се до JavaScript.
+				<a href="#res2">[2]</a>
+			</p>
+            <figure>
+				<img src="wasm_logo.png" width="250" height="250"/>
+				<figcaption>Фигура 2. WASM logo</figcaption>
+			</figure>
+			<br/>
+	
+			<p id="dotNETinsteadofJS">
+				Щом съществува възможност да изпълним код на който и да било език от високо ниво в браузъра, защо не .NET код? За целта е нужна .NET среда за изпълнение (.NET runtime), 
+				която да върви над WebAssembly в браузъра. Тази задача се оказва възможна:
+				Mono е open source, cross platform имплементация на платформата .NET на Microsoft, базирана на ECMA стандартите за C# и CLR (Common Language Runtime). Още през 2017 Mono екипът
+				публикува първите резултати от опитите си да компилира Mono (а с него и C#, CLR и .NET) до WebAssembly код. Средата за изпъление на Mono (Mono's runtime) успешно
+				е компилирана в WebAssembly код - налице е файлът mono.wasm, който осигурява .NET runtime за изпълнение на Blazor apps в браузъра. При стартиране на Blazor приложение в
+				браузъра помощните JS файлове blazor.js и mono.js, които биват свалени заедно с приложението, задействат Mono runtime (mono.wasm), който в последствие зарежда и изпълнява 
+				DLL файловете на приложението и на .NET Framework.
+				<br>
+				.NET кодът, който върви в браузъра посредством WebAssembly, се изпълнява в същата изолирана среда (security sandbox), в която се изпълнява и JavaScript кодът в браузъра
+				(browser's JavaScript sandbox ), поради което не представлява риск за сигурността, тъй като са в сила всички предпазни мерки на sandbox-а срещу злонамерени действия на 
+				клиентската машина.
+				<a href="#res3">[3]</a>
+				<a href="#res4">[4]</a>
+				<a href="#res5">[5]</a>
+			</p>
+			<br/>
+			<figure>
+				<img src="blazor-architecture.jpg" width="500" height="500"/>
+				<figcaption>Фигура 3. Blazor client-side architecture</figcaption>
+			</figure>
+			<h3 id="Razor">Razor компоненти</h2>
+			<p>
+				Blazor приложенията са компонентно-базирани. .NET runtime и WebAssembly са основата, върху която стъпват компонентите на едно Blazor приложение. Компонент в Blazor е UI 
+				елемент като например страница, диалог или форма. Компонентите представляват .NET класове, които се компилират до .NET assemblies, изпълними от .NET runtime. Всеки компонент представлява
+				цялостна независима единица и може да бъде многократно преизползван и влаган в други компоненти, което позволява голяма гъвкавост при разработването на потребителския интерфейс.
+				Компонентите обикновено са реализирани под формата на Razor markup с файлово разширение .razor. Оттук нататък ще ги наричаме Razor компоненти.
+				Razor е синтаксис, разработен за комбиниране на HTML markup със C# код. HTML markup определя вида (UI) на Razor компонентите, а C# кодът реализира динамичната логика, чрез която видът им се променя и 
+                реагира на UI events. Името Blazor идва от browser + Razor, тоест Razor в браузъра.
+				<br/>
+				Razor компонентите си взаимодействат с елементите на DOM дървото, по-точно C# кодът поема ролята, която традиционо се изпълнява от JavaScript в браузърите: получава UI events, 
+				идващи от DOM, и динамично променя DOM елементите в отговор на UI събитието.
+				<a href="#res6">[6]</a>
+			</p>
+			
+			<figure>
+				<img src="blazor-webassembly.png" width="300" height="250"/>
+				<figcaption>Фигура 4. Blazor WebAssembly</figcaption>
+			</figure>
+
+			<p>
+				Да разгледаме примерен код на Razor компоненти:
+				<br/>
+				Следният Razor markup демонстрира компонент (Dialog.razor), който може да бъде вложен в друг компонент:
+				<br/>
+				<i>Код 1. Dialog.razor:</i>
+			</p>	
+			<pre><code>             <em>&lt;div&gt;</em>
+                   <em>&lt;h1&gt;@</em>Title<em>&lt;/h1&gt;</em>
+
+                   <em>@</em>ChildContent
+
+                   <em>&lt;button @</em>onclick=<span style="color:red">&quot;OnYes&quot;</span>&gt;Yes!<em>&lt;/button&gt;</em>
+             <em>&lt;/div&gt;</em>
+
+             <em>@</em>code {
+                [Parameter]
+                 public string Title { get; set; }
+
+                [Parameter]
+                public RenderFragment ChildContent { get; set; }
+
+                private void OnYes()
+                {
+                 Console.WriteLine("Write to the console in C#! 'Yes' button was selected.");
+                }
+             }
+			</code></pre>
+			<p>
+			    Забележете, че компонентът се състои от стандартни HTML тагове (div, h1, button) и C# код. C# атрибутите (properties) ChildContent и Title ще получат стойности от компонента,
+				който използва Dialog компонента в своя UI. ChildContent ще е съдържанието на Dialog елемента (наследника на Dialog възела), а Title ще се инициализира като атрибут на
+				тага Dialog. OnYes() е C# метод на класа на компонента, който се използва като event handler за onclick event на button елемента.
+				<br/>
+				В следващия пример Index компонентът използва Dialog компонент:
+				<br/>
+				<br/>
+				<i>Код 2. Index.razor:</i>
+			</p>
+				<pre><code>                 <em>@</em>page "/"
+
+                  <em>&lt;h1&gt;</em>Hello, world!<em>&lt;/h1&gt;</em>
+
+                  Welcome to your new app.
+
+                  <em>&lt;Dialog</em> Title=<span style="color:red">&quot;Blazor&quot;</span><em>&gt;</em>
+                       Do you want to <em>&lt;i&gt;</em>learn more<em>&lt;/i&gt;</em> about Blazor?
+                  <em>&lt;/Dialog&gt;</em>
+				</code></pre>
+				Компонентът Dialog се изобразява като част от родителя си (Index.razor) в браузъра:
+				<br/>
+			      <figure>
+				    <img src="dialog_result.png" width="650" height="400"/>
+				    <figcaption>Фигура 5. Component-based Blazor app</figcaption>
+			      </figure>
+			<p>
+				Важно е да отбележим, че Blazor приложението е изградено изцяло от компоненти и се състои от една страница (Single page application). Очевидно ролята на начална страница index.php 
+				в приложение на PHP тук се изпълнява от компонент (Index.razor), който не представлява отделна страница.
+				<a href="#res6">[6]</a>
+			</p>
+			
+			<p>
+			Да обобщим какво се случва при зареждане и изпълнение на Blazor WebAssembly app в браузъра:
+			  <ul>
+			     <li> Файловете със C# код и Razor файловете на приложението се компилират до изпълними .NET assemblies</li>
+				 <li> Получените .NET assemblies и средата за изпълнение (.NET runtime) се свалят (download) на браузъра</li>
+				 <li> Blazor WebAssembly стартира средата за изпълнение (.NET runtime) и я конфигурира така, че тя да започне да зарежда и изпълнява 
+				      изпълнимите .NET assemblies за приложението (в общия случай .dll файлове) </li>
+			  </ul>
+			  
+			  Тъй като при този hosting модел на Blazor работата на сървъра се ограничава до това да предостави на браузъра файловете на приложението и 
+			  средата за изпълнение под формата на статични файлове, то са възможни и server-less алтернативи на deployment като сваляне на файловете от
+			  Content Delivery Network (CDN) например. Независими сме от наличието на сървър и е възможно приложението да се изпълнява в браузъра дори в 
+			  offline режим.
+			  <br/>
+			  <br/>
+			  Тъй като цялото приложение се сваля и изпълнява в браузъра на клиентската машина, то размерът на приложението (payload) е критична мярка за това колко бързо 
+			  ще се зареди и ще стартира приложението. Прекалено големи приложения е възможно да се зареждат твърде бавно и това да развали потребителското изживяване.
+			  Затова пък имаме висока интерактивност и кратко време за реакция на приложенито, тъй като се намираме в браузъра и user events биват отразени веднага.
+			  <br/>
+			  <br/>
+			  Трябва да отбележим, че архитектурата на Blazor WebAssembly налага да минем през JavaScript в процеса на зареждане (bootstrap) на .NET runtime,
+			  описан <a href="#dotNETinsteadofJS">по-горе</a>, при DOM манипулации, тъй като C# няма директен достъп до DOM дървото, и при достъп до browser API.
+			  (Виж Фигура 3).
+			  
+			  <a href="#res3">[3]</a>
+			  <a href="#res5">[5]</a>
+			  <a href="#res6">[6]</a>
+			</p>
+			
+			<h2 id="serversideBlazor">Blazor от страна на сървъра (Blazor Server)</h2>
+				 <p>
+				    По същество нищо не обвързва Blazor с WebAssembly и той би могъл да се изпълнява навсякъде, където имаме .NET среда. Тъй като очевидно можем да имаме .NET
+					среда за изпълнение върху сървър, нищо не пречи да изпълняваме същите Blazor компоненти в .NET среда, но на сървър вместо в браузъра. При този модел на 
+					архитектура, още известен като Server-side Blazor или Blazor Server, Razor компонентите се изпълняват върху .NET среда на сървър като част от ASP.NET Core
+					приложение. Връзката с DOM в браузъра и актуализацията на елементите от потребителския интерфейс става посредством SignalR web-socket конекция. Технологията
+					SignalR е част от ASP.NET платформата и прави възможно кодът от страна на сървъра да актуализира страниците в браузърите на свързани клиенти в реално време, 
+					без да е нужен refresh на страницата.
+					<br/>
+					Средата за изпълнение управлява изпращането на UI events от браузъра до сървъра, изпълнението на съответния код от Razor компонентите на сървъра и изпращането на 
+					изчислените UI актуализации от сървъра към браузъра. Тъй като всички изчисления се случват на сървъра, тоест приложението се хоства и кодът му се изпълнява
+					изцяло на сървъра, казваме, че при този hosting модел на Blazor клиентската машина влиза в ролята на тънък клиент (thin client). Вместо да сваля всички изпълними
+					файлове за приложението заедно с .NET средата за изпълнението им, както беше при Blazor WebAssembly модела, тук клиентският браузър сваля само една малка страница
+					и актуализира UI елементите й посредством SignalR връзката със сървъра. 
+					<br/>
+					Оттук следва предимството, че при този модел приложението се зарежда и стартира  
+					много по-бързо. Друго предимство е, че приложението може да се възползва от всички ресурси на сървъра като например база данни. 
+					<br/>
+					Недостатък на този hosting модел пред Blazor WebAssembly е,
+					че времето за реакция на приложението е по-дълго, тъй като всяко взаимодействие с потребителя минава през мрежата, преди да бъде отразено. 
+					Освен това, тъй като е необходима постоянна връзка между браузъра и сървъра по време на изпълнение на приложението, няма възможност за offline
+					режим на изпълнение, каквато имахме при Blazor WebAssembly модела.
+					<a href="#res6">[6]</a>
+			        <a href="#res7">[7]</a>
+			        <a href="#res8">[8]</a>
+				</p>
+				<br/>
+			<figure>
+				<img src="blazor-server.png" width="650" height="400"/>
+				<figcaption>Фигура 6. Blazor Server</figcaption>
+			</figure>
+			
+			<h2 id="moreAboutBlazor">Допълнения</h2>
+			
+			<ol>
+				<li>
+					<h3 id="codeSharing">Споделяне на код с Blazor</h3>
+					<p>
+						Тъй като Blazor ни дава възможност да изпълняваме .NET код в браузъра, можем да изградим както логиката от страна на клиента, така и тази
+						от страна на сървъра с един и същ език на една и съща платформа. Това е предимство, което ни позволява да споделяме код и 
+						библиотеки между сървъра и клиента.
+						<a href="#res5">[5]</a>
+						<br/>
+						Blazor имплементира .NET Standard 2.0. .NET Standard е формална спецификация на .NET APIs, които са общи (споделят се) между всички .NET
+						имплементации. Библиотеките, включени в .NET стандарта, могат да се споделят между различни .NET платформи като Blazor, .NET Framework, .NET Core, 
+						Xamarin, Mono и Unity. Мотивацията зад .NET стандарта е да се унифицира .NET екосистемата.
+					  <a href="#res6">[6]</a>
+					  <a href="#res9">[9]</a>
+					</p> 
+					<figure>
+						<img src="share_libraries.jpg" width="300" height="250"/>
+						<figcaption>Фигура 7. Code sharing </figcaption>
+					</figure>
+					
+				</li>
+				
+				<li>
+					<h3 id="noPluginsNoCodeTransp">Технология от ново поколение без необходимост от plugins или code transpilation</h3>
+					<p>
+					    Blazor използва отворени уеб стандарти (open web standards), без да има необходимост от plugins, какъвто е случаят с технологии като Silverlight, или превод на код
+						от един език на друг. Code transpilation е процесът на превеждане на код от един език за програмиране на друг. Превеждане на код от друг език
+						на JavaScript е честа практика, когато искаме да изпълним код в браузъра, написан на език, различен от JavaScript. Тази практика обаче обикновено води
+                        до много ограничена функционалност. Blazor е много по-иновативен в сравнение с този тип технологии и ги превъзхожда по отношение на функционалност, 
+						тъй като се изпълнява реален .NET код в браузъра без code transpilation до JavaScript.
+						<br/>
+						Blazor работи във всички съвременни браузъри, включително мобилни браузъри.
+						<a href="#res9">[9]</a>
+					</p>
+					<figure>
+						<img src="supports_allBrowsers.jpg" width="300" height="250"/>
+						<figcaption>Фигура 8. All modern browsers support </figcaption>
+					</figure>
+					
+				</li>
+
+				<li>
+					<h3 id="JSinterop">Оперативна съвместимост с JS</h3>
+					<p>
+					    Blazor оставя възможността C# кодът лесно да извиква JavaScript APIs и библиотеки при нужда. Въпреки че пишем логиката на приложението си на C#, 
+						можем да продължим да използваме и богатата екосистема на JavaScript. В Blazor приложенията е възможно .NET кодът да извиква JavaScript функции,
+						както и обратно - в JavaScript код да се извикват .NET методи. Този сценарий наричаме JS interoperability.
+						<br/>
+						В случая на Blazor Server JS interop calls се осъществяват посредством SignalR връзката между клиента и сървъра.
+						<a href="#res9">[9]</a>
+					</p>
+					<figure>
+						<img src="JSinterop.jpg" width="300" height="250"/>
+						<figcaption>Фигура 9. JavaScript interoperability </figcaption>
+					</figure>
+					
+				</li>
+
+			</ol>
+			
+			<h2 id="demo">Demos</h2>
+			<ol>
+				<li>
+				<h3 id="components">Компоненти, преизползване на компоненти и споделяне на код</h3>
+					<figure>
+				      <iframe width="560" height="315" src="https://www.youtube.com/embed/93OtjA8VUgc?start=540" frameborder="0" allowfullscreen></iframe>
+				      <figcaption>Demo 1: Компоненти, преизползване на компоненти и споделяне на код <a href="#res5">[5]</a></figcaption>
+			        </figure>
+				</li>
+				
+				<li>
+					<h3 id="demoapp">Weather Forecast App </h3>
+					 <figure>
+				      <iframe width="560" height="315" src="https://www.youtube.com/embed/z9BOkBFDbc0?start=61" frameborder="0" allowfullscreen></iframe>
+				      <figcaption>Demo 2: Weather Forecast App <a href="#res10">[10]</a></figcaption>
+			        </figure>
+				</li>
+				
+			</ol>
+			
+			<h2 id="futureOfBlazor">Бъдещето на Blazor? WebAssembly and Blazor: Reassembling the Web?</h2>
+			<p> 
+			Историята на Web разработването познава много опити за избягване или замяна на JavaScript и класическите front-end похвати с други технологии - 
+			кои повече, кои по-малко успешни. Само някои от примерите са Java Applets (1995-2013), Microsoft ActiveX (появява се с Internet Explorer 3.0 през 1996),
+			Microsoft's ASP.NET Web Forms (2002), JavaServer Faces (JSF), Google Web Toolkit (2006), Microsoft Silverlight (2007) и множество "compile-to-JavaScript"
+			езици и транспилатори.
+			<br/>
+			<br/>
+			Неудовлетвореността от JavaScript като език за програмиране съществува още от ранните дни на създаването му и се изразява в множество опити езикът да се 
+			разшири със статична типизация. Свидетелство за това са популярният TypeScript на Microsoft, както и проекти като SoundScript на Google от 2015 и 
+			Flow на Facebook от 2016.
+			<br/>
+			<br/>
+			Днес имаме Blazor и WebAssembly, но с какво те се различават от изброените горе технологии?
+			<br/>
+			<br/>
+			Всички подобни технологии, които са се появявали преди, спадат към една от две категории: те са или browser extension (plugin), съществуващ извън security sandox
+			на браузъра, или слой над HTML, CSS и JavaScript, който ги абстрахира, и обикновено работи чрез code transpilation до JavaScript.
+			<br/>
+			<br/>
+			WebAssembly е различен с това, че е част от всички съвременни браузъри и не изисква никакви допълнителни инсталации и конфигурации. Оперира в
+			същата security sandox на браузъра, в която оперира и JavaScript, тоест от гледна точка на сигурността кодът няма достъп до нищо повече от това, до 
+			което би имал достъп стандартен JavaScript код в браузъра. 
+			<br/>
+			<br/>
+			Бидейки език от ниско ниво, той е много по-добра compilation target за езици от високо ниво, за които единствената възможност да се изпълняват в браузъра преди
+			беше да се "компилират", по-точно транспилират до JS код (code transpilation to JavaScript). 
+			<br/>
+			<br/>
+			Blazor отваря вратите за .NET в браузъра, стъпвайки върху WebAssembly. Това ни позволява да изпълняваме .NET код в браузъра natively. Оттук следва, че 
+			изпълнението е много по-бързо от сценарии с transpilation to JavaScript и освен това имаме възможност да използваме цялата функционалност и многобройни инструменти,
+			които предоставя .NET екосистемата.
+			<br/>
+			<br/>
+			В заключение можем да кажем, че Blazor превъзхожда много на пръв поглед подобни на него технологии, създавани през годините. Започнал като експериментален проект
+			в началото на 2018, днес Blazor е част от ASP.NET Core. Често се задава въпросът, дали Blazor може да замени JavaScript. Дори това да не се случи, 
+			Blazor е създаден не с цел да измести JS, а с цел да съществуват алтернативи на JS. Тази своя задача Blazor вече изпълнява блестящо, обогатявайки света на
+			client-side уеб разработката с една изключително интересна и иновативна концепция. Можем да обобщим, че Blazor е технология с голям потенциал, която със
+			сигурност ще има вълнуващо бъдеще.
+			<a href="#res11">[11] </a>
+			</p>
+			<br/>
+			<h2 id="reference">Използвана литература</h2>
+			<ul>
+				<li id="res1">
+					[1] Github repository of Blazor,
+					<a href="https://github.com/aspnet/AspNetCore/tree/master/src/Components" target="_blank">[https://github.com/aspnet/AspNetCore/tree/master/src/Components]</a> 
+			    </li>
+				<li id="res2">
+					[2] WebAssembly,
+					<a href="https://en.wikipedia.org/wiki/WebAssembly" target="_blank">[https://en.wikipedia.org/wiki/WebAssembly]</a> 
+				</li>
+				<li id="res3">
+					[3] Learn Blazor,
+					<a href="https://learn-blazor.com/getting-started/what-is-blazor/" target="_blank">[https://learn-blazor.com/getting-started/what-is-blazor/]</a> 
+		        </li>
+				<li id="res4">
+					[4] Mono,
+					<a href="https://www.mono-project.com/" target="_blank">[https://www.mono-project.com/]</a>
+				</li>
+				<li id="res5">
+					[5] Blazor - Getting Started with Daniel and Mehul - video by Daniel Roth, Microsoft PM for Blazor, and Mehul Harry, DevExpress Web PM
+					<a href="https://www.youtube.com/watch?v=93OtjA8VUgc#t=20m00s" target="_blank">[https://www.youtube.com/watch?v=93OtjA8VUgc#t=20m00s]</a> 
+				</li>
+				<li id="res6">
+					[6] Introduction to ASP.NET Core Blazor,
+					<a href="https://docs.microsoft.com/en-us/aspnet/core/blazor/?ranMID=24542&ranEAID=je6NUbpObpQ&ranSiteID=je6NUbpObpQ-GDl5c9iHxr_NLpzNR.FKYg&epi=je6NUbpObpQ-GDl5c9iHxr_NLpzNR.FKYg&irgwc=1&OCID=AID2000142_aff_7593_1243925&tduid=(ir__glhpzmfu9ckfrmoqkk0sohz30n2xgt9dpvxg6kz100)(7593)(1243925)(je6NUbpObpQ-GDl5c9iHxr_NLpzNR.FKYg)()&irclickid=_glhpzmfu9ckfrmoqkk0sohz30n2xgt9dpvxg6kz100&view=aspnetcore-3.0" target="_blank">
+					[https://docs.microsoft.com/en-us/aspnet/core/blazor/?ranMID=24542&ranEAID=je6NUbpObpQ&ranSiteID=je6NUbpObpQ-GDl5c9iHxr_NLpzNR.FKYg&epi=je6NUbpObpQ-GDl5c9iHxr_NLpzNR.FKYg&irgwc=1&OCID=AID2000142_aff_7593_1243925&tduid=(ir__glhpzmfu9ckfrmoqkk0sohz30n2xgt9dpvxg6kz100)(7593)(1243925)(je6NUbpObpQ-GDl5c9iHxr_NLpzNR.FKYg)()&irclickid=_glhpzmfu9ckfrmoqkk0sohz30n2xgt9dpvxg6kz100&view=aspnetcore-3.0]
+					</a>
+				</li>
+				<li id="res7">
+					[7] Blazor, a new framework for browser-based .NET apps - Steve Sanderson,
+					<a href="https://www.youtube.com/watch?v=6BT2AF9PO5g" target="_blank">[https://www.youtube.com/watch?v=6BT2AF9PO5g]</a>
+				</li>
+				<li id="res8">
+					[8] Wikipedia page for Blazor,
+					<a href="https://en.wikipedia.org/wiki/Blazor" target="_blank">[https://en.wikipedia.org/wiki/Blazor]</a> 
+				</li>
+				<li id="res9">
+					[9] Microsoft Blazor official web page,
+					<a href="https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor" target="_blank">[https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor]</a>
+				</li>
+				<li id="res10">
+					[10] Blazor Component Basics,
+					<a href="https://www.youtube.com/watch?v=z9BOkBFDbc0" target="_blank">[https://www.youtube.com/watch?v=z9BOkBFDbc0]</a> 
+				</li>
+				<li id="res11">
+					[11] Why Blazor, via WebAssembly, is the future - article by Michael K. Snead
+					<a href="https://medium.com/@aikeru/why-blazor-via-webassembly-is-the-future-123ac3379cc6" target="_blank">[https://medium.com/@aikeru/why-blazor-via-webassembly-is-the-future-123ac3379cc6]</a> 
+				</li>
+				
+			</ul>
+			
+			<h2>Списък с код</h2>
+			<ul>
+				<li>
+					Код 1: Dialog.razor
+			    </li>
+				<li>
+					Код 2: Index.razor
+				</li>
+				
+			</ul>
+			
+		   <h2>Списък с фигури</h2>
+			<ul>
+				<li>
+					 Фигура 1. Blazor logo
+			    </li>
+				<li>
+					 Фигура 2. WASM logo
+				</li>
+				<li>
+					 Фигура 3. Blazor client-side architecture
+		        </li>
+				<li>
+					 Фигура 4. Blazor WebAssembly
+				</li>
+				<li>
+					 Фигура 5. Component-based Blazor app
+				</li>
+				<li>
+					 Фигура 6. Blazor Server
+				</li>
+				<li>
+					 Фигура 7. Code sharing
+				</li>
+				<li>
+					 Фигура 8. All modern browsers support
+				</li>
+				<li>
+					 Фигура 9. JavaScript interoperability
+				</li>
+				
+			</ul>
+			<h2>Списък Demos</h2>
+			<ul>
+				<li>
+					Demo 1: Компоненти, преизползване на компоненти и споделяне на код
+			    </li>
+				<li>
+					Demo 2: Weather Forecast App
+				</li>
+				
+			</ul>
+			<h2>Изготвил:</h2>
+			<ul>
+				<li>
+					Елена Георгиева
+			    </li>
+				<li>
+					Компютърни науки, 4.курс, ФН: 81555
+				</li>
+				
+			</ul>
+			
+		</div>
+	
+	</body>
+
+
+</html>

@@ -1,0 +1,68 @@
+body {
+	font-family: Times New Roman, Georgia, Serif;
+	font-size: 18px;
+	line-height: 120%;
+	background-color: #e6ccff;
+}
+
+h1, h2, h3 {
+	line-height: 120%;
+}
+
+em {
+    color: blue
+   }
+  
+ code {
+    font-size: 80%
+ }
+
+#navMenu {
+	padding:0;
+	margin:0;	
+	left: 0;
+	top: 0;
+	color: #fff;
+	position:absolute;
+	display:inline-block;
+}
+
+#navMenu ul {
+	list-style-type: none;
+	margin: 0%;
+	padding: 0%;
+	width: 20%;
+	height: 100%; /* Full height */
+	background-color: #a31aff;
+	position: fixed; /* Make it stick, even on scroll */
+	overflow: auto; /* Enable scrolling if the sidenav has too much content */
+}
+
+#content {
+	width: 60%;
+	position: absolute;
+	right: 0;
+	margin-left: 10%;
+	margin-right: 10%;
+	margin-bottom: 20px;
+	text-align: justify;
+}
+
+#navMenu li a {
+		display: block;
+		color: #fff;
+		padding: 8px 16px;
+		text-decoration: none;
+}
+
+#navMenu li a:hover {
+		background-color: #ebccff;
+		color: black;
+}
+figure {
+	text-align: center;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
